@@ -54,7 +54,7 @@ const ProductLists = () => {
               <Card
                 key={index}
                 style={{
-                  width: 280,
+                  width: 340,
                   height: 350,
                   display: "flex",
                   flexDirection: "column",
@@ -71,10 +71,10 @@ const ProductLists = () => {
               <div key={product.id}>
                 <Link href={`/products/${product.id}`}>
                   <Card
-                  className="sm:w-full"
+                  className="w-full"
                     hoverable
                     style={{
-                      width: 280,
+                      width: 340,
                       height: 350,
                       display: "flex",
                       flexDirection: "column",
