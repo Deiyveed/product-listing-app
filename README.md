@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This is a product listing app,  were a fakestore api was consumed to get grid of products. There is an add to cart function where the numbers of item added to cart is stored. There is also use of dynamic routing to get each products on a different page when clicked. Lastly, there is search option to easily find products by title.
 
-## Getting Started
+## My Approach
 
-First, run the development server:
+I built the application using Next.js with the App Router to take advantage of modern routing without the stress of react router dom
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+I separated concerns by:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Creating reusable components such as product cards and search input
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Abstracting data fetching into a custom hook for cleaner logic. I like to separate logic from design where necessary.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Using Zustand for global state management to handle cart functionality without too many prop drilling
 
-## Learn More
+I implemented dynamic routing for product detail pages using [id], allowing each product to have its own dedicated page.
 
-To learn more about Next.js, take a look at the following resources:
+I made use of props where applicable.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+For UI/UX, I used Tailwind CSS for styling and Ant Design Skeletons to improve perceived performance during loading states.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Trade offs and Assumptions
 
-## Deploy on Vercel
+I chose client-side data fetching for product details using useEffect instead of server-side fetching for simplicity and flexibility with interactivity (e.g., cart actions).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+I assumed the API response structure would remain consistent (id, title, price, etc.), so I strongly typed it with TypeScript.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+I used local state and Zustand instead of a more complex solution like Redux to keep the implementation lightweight and easy to maintain.
+
+## What I would improve with more time
+
+With more time, I would:
+
+Implement pagination or infinite scrolling instead of loading all products at once
+
+Add a full cart page with quantity controls and checkout integration
+
+Impleement persist for the store so it stays the same even upon reload
+
+Implement search based on other criterias
+
+Design more aesthetically pleasing Ui
