@@ -20,7 +20,7 @@ const useFetchProducts = () => {
 
   const params = useParams();
   const id = params.id as string;
-  
+
   // to fetch all products
   const fetchProducts = async () => {
     try {

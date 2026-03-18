@@ -1,12 +1,13 @@
 "use client";
 
-import { Card, Skeleton } from "antd";
+import { Card, message, Skeleton } from "antd";
 import SearchButton from "./SearchButton";
-import { ShoppingCartOutlined } from "@ant-design/icons";
+import { LoadingOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import Image from "next/image";
 import { useCartStore } from "../store/cartStore";
 import useFetchProducts from "../hooks/useFetchProducts";
 import Link from "next/link";
+import { useState } from "react";
 
 const ProductLists = () => {
   const { handleSearch, loading, error, searchQuery, filteredProducts } =
@@ -14,6 +15,8 @@ const ProductLists = () => {
 
   const addToCart = useCartStore((state) => state.addToCart);
   const totalItems = useCartStore((state) => state.getTotalItems());
+
+  const [loadingId, setLoadingId] = useState<number | null>(null);
 
   if (error) {
     return <p>Error: {error}</p>;
@@ -71,7 +74,7 @@ const ProductLists = () => {
               <div key={product.id}>
                 <Link href={`/products/${product.id}`}>
                   <Card
-                  className="w-full"
+                    className="w-full"
                     hoverable
                     style={{
                       width: 340,
@@ -100,15 +103,33 @@ const ProductLists = () => {
                     </h2>
                     <p className=" text-2xl font-bold">NGN {product.price}</p>
                     <button
-                      className=" py-1 px-3 mt-3 font-semibold rounded-lg text-white bg-[#39CDCC] border hover:text-[#39CDCC] hover:bg-white cursor-pointer"
-                      type="submit"
+                      disabled={loadingId === product.id}
+                      className={`py-1 px-3 mt-3 font-semibold rounded-lg text-white 
+                       ${
+                         loading
+                           ? "bg-gray-400 cursor-not-allowed"
+                           : "bg-[#39CDCC] hover:bg-white hover:text-[#39CDCC] border cursor-pointer"
+                       }`}
                       onClick={(e) => {
                         e.stopPropagation();
                         e.preventDefault();
-                        addToCart(product);
+
+                        setLoadingId(product.id);
+
+                        setTimeout(() => {
+                          addToCart(product);
+                          setLoadingId(null);
+
+                          message.success(
+                            `${product.title} successfully added to cart`
+                          );
+                        }, 500);
                       }}
                     >
-                      ADD TO CART
+                      {loadingId === product.id && (
+                        <LoadingOutlined className=" mr-2" spin />
+                      )}
+                      {loadingId === product.id ? "Adding..." : "ADD TO CART"}
                     </button>
                   </Card>
                 </Link>
