@@ -14,7 +14,11 @@ type CartItem = Product & {
 type CartState = {
   cart: CartItem[];
   addToCart: (product: Product) => void;
+  increment: (id: number) => void;
+  decrement: (id: number) => void;
+  removeFromCart: (id: number) => void;
   getTotalItems: () => number;
+  getTotalPrice: () => number;
 };
 
 export const useCartStore = create<CartState>((set, get) => ({
@@ -38,6 +42,32 @@ export const useCartStore = create<CartState>((set, get) => ({
     }
   },
 
+  removeFromCart: (id: number) =>
+    set((state) => ({
+      cart: state.cart.filter((item) => item.id !== id),
+    })),
+
+  increment: (id) => {
+    set({
+      cart: get().cart.map((item) =>
+        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+      ),
+    });
+  },
+
+  decrement: (id) => {
+    set({
+      cart: get()
+        .cart.map((item) =>
+          item.id === id ? { ...item, quantity: item.quantity - 1 } : item
+        )
+        .filter((item) => item.quantity > 0), // remove if 0
+    });
+  },
+
   getTotalItems: () =>
     get().cart.reduce((total, item) => total + item.quantity, 0),
+
+  getTotalPrice: () =>
+    get().cart.reduce((total, item) => total + item.price * item.quantity, 0),
 }));

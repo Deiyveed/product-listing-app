@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, message, Skeleton } from "antd";
+import { Card, Drawer, message, Skeleton } from "antd";
 import SearchButton from "./SearchButton";
 import { LoadingOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import Image from "next/image";
@@ -13,10 +13,24 @@ const ProductLists = () => {
   const { handleSearch, loading, error, searchQuery, filteredProducts } =
     useFetchProducts();
 
+  // add to cart, remove from cart and total cart items
+  const cart = useCartStore((state) => state.cart);
   const addToCart = useCartStore((state) => state.addToCart);
+  const removeFromCart = useCartStore((state) => state.removeFromCart);
+  const increment = useCartStore((state) => state.increment);
+  const decrement = useCartStore((state) => state.decrement);
   const totalItems = useCartStore((state) => state.getTotalItems());
+  const total = useCartStore((state) => state.getTotalPrice());
 
+  // loading state for button
   const [loadingId, setLoadingId] = useState<number | null>(null);
+
+  // show items added to cart when cart is clicked
+
+  const [open, setOpen] = useState(false);
+
+  const showDrawer = () => setOpen(true);
+  const closeDrawer = () => setOpen(false);
 
   if (error) {
     return <p>Error: {error}</p>;
@@ -39,7 +53,7 @@ const ProductLists = () => {
           placeholder="Search Products"
         />
 
-        <div className="relative mx-4 mt-3 lg:mt-0">
+        <button className="relative mx-4 mt-3 lg:mt-0" onClick={showDrawer}>
           <ShoppingCartOutlined className="text-5xl cursor-pointer" />
 
           {totalItems > 0 && (
@@ -47,7 +61,75 @@ const ProductLists = () => {
               {totalItems}
             </span>
           )}
-        </div>
+        </button>
+        <Drawer
+          title="Your Cart 🛒"
+          placement="right"
+          onClose={closeDrawer}
+          open={open}
+          size={450}
+        >
+          {totalItems === 0 ? (
+            <p>Your cart is empty</p>
+          ) : (
+            cart.map((item) => (
+              <div
+                key={item.id}
+                className="flex justify-between gap-3 mb-4 pb-4 items-center border-b border-gray-200 "
+              >
+                <div className="flex justify-between items-center gap-2">
+                  <Image
+                    src={item.image}
+                    alt={item.title}
+                    width={30}
+                    height={30}
+                  />
+                  <div>
+                    <h3 className="text-sm font-semibold">{item.title}</h3>
+                    {/* price per item */}
+                    <p className="text-sm text-gray-500">
+                      ₦{item.price} x {item.quantity}
+                    </p>
+
+                    {/* total for this item */}
+                    <p className="font-bold">
+                      ₦{(item.price * item.quantity).toFixed(2)}
+                    </p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <button
+                        onClick={() => decrement(item.id)}
+                        className="px-2 bg-gray-200 rounded cursor-pointer"
+                      >
+                        -
+                      </button>
+
+                      <span>{item.quantity}</span>
+
+                      <button
+                        onClick={() => increment(item.id)}
+                        className="px-2 bg-gray-200 rounded cursor-pointer"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <button
+                    onClick={() => removeFromCart(item.id)}
+                    className="text-red-500 text-xs cursor-pointer"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+          <div className="mt-4 relative bottom-0 pt-4 font-bold text-xl">
+            Total:{" "}
+            <span className="text-green-500">₦{total.toFixed(2)}</span>
+          </div>
+        </Drawer>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 gap-6 mt-6 mb-6">
@@ -101,7 +183,9 @@ const ProductLists = () => {
                     <h2 className=" font-medium">
                       {product.title.substring(0, 50)}...
                     </h2>
-                    <p className=" text-2xl font-bold">NGN {product.price}</p>
+                    <p className="text-2xl font-bold">
+                      ₦{product.price.toLocaleString()}
+                    </p>
                     <button
                       disabled={loadingId === product.id}
                       className={`py-1 px-3 mt-3 font-semibold rounded-lg text-white 
